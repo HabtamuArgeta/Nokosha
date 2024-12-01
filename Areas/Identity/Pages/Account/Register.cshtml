@@ -1,67 +1,157 @@
 ﻿@page
 @model RegisterModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Sign up";
 }
 
-<h1>@ViewData["Title"]</h1>
-
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-10 col-sm-5 mx-auto rounded border p-3 shadow-lg" style="background-color: #f8f9fa;">
+        <br />
+        <h2 class="text-center"><b>Sign up<b></b></h2>
+        <br />
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
+
+            <div class="row mb-3">
+                <label class="col-sm-4" asp-for="Input.UserName">UserName</label>
+                <div class="col-sm-8">
+                    <input asp-for="Input.UserName" class="form-control" autocomplete="UserName" aria-required="true" placeholder="Nokosha" />
+                    <span asp-validation-for="Input.UserName" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            <div class="row mb-3">
+                <label class="col-sm-4" asp-for="Input.Email">Email</label>
+                <div class="col-sm-8">
+                    <input asp-for="Input.Email" class="form-control" autocomplete="Email" aria-required="true" placeholder="name@example.com" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
+
+            <div class="row mb-3">
+                <label class="col-sm-4" asp-for="Input.Password">Password</label>
+                <div class="col-sm-8 ">
+                    <div class="input-group">
+                        <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" id="passwordInput1" />
+                        <span class="input-group-text" id="togglePassword1">
+                            <i id="togglePasswordIcon1" class="bi bi-eye"></i>
+                        </span>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
+                </div>
+            </div>
+
+            <div class="row mb-3" >
+                <label class="col-sm-4" asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <div class="col-sm-8 ">
+                    <div class="input-group">
+                        <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" id="passwordInput2" />
+                        <span class="input-group-text" id="togglePassword2">
+                            <i id="togglePasswordIcon2" class="bi bi-eye"></i>
+                        </span>
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" id="selectOnOfCheckBox">
+                <div class="col-6">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" asp-for="Input.Youtuber" id="YoutuberCheckbox">
+                        <label class="form-check-label" for="YoutuberCheckbox">@Html.DisplayNameFor(m => m.Input.Youtuber)</label>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" asp-for="Input.Subscriber" id="SubscriberCheckbox">
+                        <label class="form-check-label" for="SubscriberCheckbox">@Html.DisplayNameFor(m => m.Input.Subscriber)</label>
+                    </div>
+                </div>
+            </div>
+
+
+            <br />
+            <button id="registerSubmit" type="submit" class="m-2 btn btn-primary w-100">Register</button>
+            <div class="text-center">
+                Already have an account? <a asp-area="Identity" asp-page="/Account/Login">Login</a>
+            </div>
+        </form>
     </div>
 </div>
 
 @section Scripts {
+    <script>
+        // Add validation for checkboxes on form submission
+        document.getElementById("registerSubmit").addEventListener("click", function (e) {
+            const youtuberCheckbox = document.getElementById("YoutuberCheckbox");
+            const subscriberCheckbox = document.getElementById("SubscriberCheckbox");
+
+            // Check if neither checkbox is selected
+            if (!youtuberCheckbox.checked && !subscriberCheckbox.checked) {
+                e.preventDefault(); // Prevent form submission
+
+                // Display error message
+                let errorMessage = document.getElementById("checkboxError");
+                if (!errorMessage) {
+                    errorMessage = document.createElement("div");
+                    errorMessage.id = "checkboxError";
+                    errorMessage.className = "text-danger text-center mt-2";
+                    errorMessage.innerText = "Please select either Youtuber or Subscriber.";
+                    document.getElementById("selectOnOfCheckBox").appendChild(errorMessage);
+                }
+            } else {
+                // Remove error message if validation passes
+                const errorMessage = document.getElementById("checkboxError");
+                if (errorMessage) {
+                    errorMessage.remove();
+                }
+            }
+        });
+
+        // Ensure mutual exclusivity for the checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    document.querySelectorAll('input[type="checkbox"]').forEach((otherCheckbox) => {
+                        if (otherCheckbox !== checkbox) {
+                            otherCheckbox.checked = false;
+                        }
+                    });
+                }
+            });
+        });
+
+        // Toggle visibility for password fields
+        document.getElementById("togglePassword1").addEventListener("click", function () {
+            const passwordInput1 = document.getElementById('passwordInput1');
+            const icon1 = document.getElementById("togglePasswordIcon1");
+
+            if (passwordInput1.type === "password") {
+                passwordInput1.type = "text";
+                icon1.classList.remove("bi-eye");
+                icon1.classList.add("bi-eye-slash");
+            } else {
+                passwordInput1.type = "password";
+                icon1.classList.remove("bi-eye-slash");
+                icon1.classList.add("bi-eye");
+            }
+        });
+
+        document.getElementById("togglePassword2").addEventListener("click", function () {
+            const passwordInput2 = document.getElementById('passwordInput2');
+            const icon2 = document.getElementById("togglePasswordIcon2");
+
+            if (passwordInput2.type === "password") {
+                passwordInput2.type = "text";
+                icon2.classList.remove("bi-eye");
+                icon2.classList.add("bi-eye-slash");
+            } else {
+                passwordInput2.type = "password";
+                icon2.classList.remove("bi-eye-slash");
+                icon2.classList.add("bi-eye");
+            }
+        });
+    </script>
+
     <partial name="_ValidationScriptsPartial" />
 }

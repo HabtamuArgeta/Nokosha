@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Nokosha")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee420accd2ba5bb885e56e718e57419281abe764")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6db405b3ca3a431eed74d339ff6b18529fafbc80")]
 [assembly: System.Reflection.AssemblyProductAttribute("Nokosha")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Nokosha")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

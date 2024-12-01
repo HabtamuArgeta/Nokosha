@@ -12,13 +12,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Nokosha.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using Nokosha.Models;
+using System.Net;
 
 namespace Nokosha.Areas.Identity.Pages.Account
 {
@@ -75,10 +76,22 @@ namespace Nokosha.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+            
+
+            [Required]
+            public string UserName { get; set; }
+
+
+
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
+
+           
+
+
+       
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -98,6 +111,12 @@ namespace Nokosha.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Display(Name = "Youtuber")]
+            public bool Youtuber { get; set; }
+
+            [Display(Name = "Subscriber")]
+            public bool Subscriber { get; set; }
         }
 
 
@@ -113,15 +132,48 @@ namespace Nokosha.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                var existingUser = await _userManager.FindByEmailAsync(Input.Email);
+                if (existingUser != null)
+                {
+                    // If a user with the email exists, add a model error
+                    ModelState.AddModelError(string.Empty, "A user with this email address already exists.");
+                    return Page();
+                }
+                var user = new ApplicationUser();
+
+                user.UserName = Input.UserName;
+                user.Email = Input.Email;
+                user.CreatedAt = DateTime.Now;
+                if (Input.Youtuber)
+                {
+                    user.RegisteredAs = "Youtuber";
+                }
+
+                else if (Input.Subscriber)
+                {
+                    user.RegisteredAs = "Subscriber";
+                }
+
+
+
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+
+                    if (Input.Youtuber)
+                    {
+                        await _userManager.AddToRoleAsync(user, "Youtuber");
+                    }
+                    else if (Input.Subscriber)
+                    {
+                        await _userManager.AddToRoleAsync(user, "Subscriber");
+                    }
+
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -142,6 +194,19 @@ namespace Nokosha.Areas.Identity.Pages.Account
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
+                        var roles = await _userManager.GetRolesAsync(user);
+
+                        if (roles.Contains("Youtuber"))
+                        {
+                            // Redirect to the applicant dashboard
+                            return RedirectToAction("Index", "Home");
+                        }
+
+                        else if (roles.Contains("Subscriber"))
+                        {
+                            // Redirect to the applicant dashboard
+                            return RedirectToAction("Index", "Home");
+                        }
                         return LocalRedirect(returnUrl);
                     }
                 }
@@ -149,6 +214,7 @@ namespace Nokosha.Areas.Identity.Pages.Account
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
+
             }
 
             // If we got this far, something failed, redisplay form

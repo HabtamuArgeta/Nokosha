@@ -47,6 +47,26 @@ namespace Nokosha.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "4b52e63e-2556-45bc-8515-fcbeb482cc46",
+                            Name = "Admin",
+                            NormalizedName = "Admin"
+                        },
+                        new
+                        {
+                            Id = "7353c211-abee-401c-9c27-152bce4a7082",
+                            Name = "Youtuber",
+                            NormalizedName = "Youtuber"
+                        },
+                        new
+                        {
+                            Id = "4d009a99-940c-4b6d-85da-d6de1e0fb1f3",
+                            Name = "Subscriber",
+                            NormalizedName = "Subscriber"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -166,9 +186,6 @@ namespace Nokosha.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
-
-                    b.Property<bool>("Approved")
-                        .HasColumnType("bit");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()

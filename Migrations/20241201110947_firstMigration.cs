@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Nokosha.Migrations
 {
     /// <inheritdoc />
@@ -32,7 +34,6 @@ namespace Nokosha.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RegisteredAs = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Approved = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -157,6 +158,16 @@ namespace Nokosha.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "4b52e63e-2556-45bc-8515-fcbeb482cc46", null, "Admin", "Admin" },
+                    { "4d009a99-940c-4b6d-85da-d6de1e0fb1f3", null, "Subscriber", "Subscriber" },
+                    { "7353c211-abee-401c-9c27-152bce4a7082", null, "Youtuber", "Youtuber" }
                 });
 
             migrationBuilder.CreateIndex(

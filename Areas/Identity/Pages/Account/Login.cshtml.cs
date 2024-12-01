@@ -8,13 +8,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Nokosha.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Nokosha.Models;
+
 
 namespace Nokosha.Areas.Identity.Pages.Account
 {
@@ -23,10 +24,13 @@ namespace Nokosha.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, UserManager<ApplicationUser> userManager) // Add UserManager parameter
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -66,8 +70,8 @@ namespace Nokosha.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
-            [EmailAddress]
-            public string Email { get; set; }
+
+            public string UserName { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -112,11 +116,39 @@ namespace Nokosha.Areas.Identity.Pages.Account
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+
+
+                    var user = await _userManager.FindByNameAsync(Input.UserName);
+                    if (user != null)
+                    {
+                        // Get the roles assigned to the user
+                        var roles = await _userManager.GetRolesAsync(user);
+
+                        // Check if the user has a specific role
+                        if (roles.Contains("Admin"))
+                        {
+                            // Redirect to the admin dashboard
+                            return RedirectToAction("Index", "Home");
+                        }
+                        else if (roles.Contains("Youtuber"))
+                        {
+                            // Redirect to the organization dashboard
+                            return RedirectToAction("Index", "Home");
+                        }
+                        else if (roles.Contains("Subscriber"))
+                        {
+                            // Redirect to the applicant dashboard
+                            return RedirectToAction("Index", "Home");
+                        }
+
+                        // If the user does not have any specific role, redirect to the default URL
+                        return LocalRedirect(returnUrl);
+                    }
+
                 }
                 if (result.RequiresTwoFactor)
                 {
